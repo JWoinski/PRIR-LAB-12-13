@@ -1,34 +1,35 @@
 import multiprocessing
 
 
-def print_cube(num):
-    """
-    funkcja wypisujaca objetosc szescianu
-    """
-    print("Cube: {}".format(num * num * num))
+def square_list(mylist, q):
+    
+    for num in mylist:
+        q.put(num * num)
 
 
-def print_square(num):
-    """
-    funkcja wypisujaca pole kwadratu
-    """
-    print("Square: {}".format(num * num))
+def print_queue(q):
+    
+    print("Queue elements:")
+    while not q.empty():
+        print(q.get())
+    print("Queue is now empty!")
 
 
 if __name__ == "__main__":
-    # creating processes
-    p1 = multiprocessing.Process(target=print_square, args=(10,))
-    p2 = multiprocessing.Process(target=print_cube, args=(10,))
+    # input list
+    mylist = [1, 2, 3, 4]
 
-    # starting process 1
+    # creating multiprocessing Queue
+    q = multiprocessing.Queue()
+
+    # creating new processes
+    p1 = multiprocessing.Process(target=square_list, args=(mylist, q))
+    p2 = multiprocessing.Process(target=print_queue, args=(q,))
+
+    # running process p1 to square list
     p1.start()
-    # starting process 2
-    p2.start()
-
-    # wait until process 1 is finished
     p1.join()
-    # wait until process 2 is finished
-    p2.join()
 
-    # both processes finished
-    print("Done!")
+    # running process p2 to get queue elements
+    p2.start()
+    p2.join()
